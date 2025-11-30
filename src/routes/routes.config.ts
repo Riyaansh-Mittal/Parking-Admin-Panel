@@ -1,0 +1,148 @@
+export const ROUTES = {
+  // Auth
+  LOGIN: '/login',
+  VERIFY_EMAIL: '/verify-email',
+  SET_PASSWORD: '/set-password',
+  
+  // Main
+  HOME: '/',
+  DASHBOARD: '/dashboard',
+  
+  // Users
+  USERS: '/users',
+  USER_DETAIL: '/users/:id',
+  
+  // Admins
+  ADMINS: '/admins',
+  ADMIN_DETAIL: '/admins/:id',
+  REGISTER_ADMIN: '/admins/register',
+  
+  // Calls
+  CALLS: '/calls',
+  CALL_DETAIL: '/calls/:id',
+  CALL_STATS: '/calls/stats',
+  
+  // Campaigns
+  CAMPAIGNS: '/campaigns',
+  CAMPAIGN_DETAIL: '/campaigns/:id',
+  CREATE_CAMPAIGN: '/campaigns/create',
+  
+  // Codes
+  CODES: '/codes',
+  CODE_DETAIL: '/codes/:id',
+  
+  // Relationships
+  RELATIONSHIPS: '/relationships',
+  RELATIONSHIP_DETAIL: '/relationships/:id',
+  
+  // Balances
+  BALANCES: '/balances',
+  BALANCE_DETAIL: '/balances/:id',
+  BALANCE_HISTORY: '/balances/history',
+  
+  // Settings
+  SETTINGS: '/settings',
+  SETTING_DETAIL: '/settings/:key',
+  
+  // Analytics
+  ANALYTICS: '/analytics',
+  CALL_ANALYTICS: '/analytics/calls',
+  REFERRAL_ANALYTICS: '/analytics/referrals',
+  
+  // Exports
+  EXPORTS: '/exports',
+  
+  // Error pages
+  NOT_FOUND: '/404',
+  UNAUTHORIZED: '/403',
+} as const;
+
+export type RouteKey = keyof typeof ROUTES;
+export type RouteValue = (typeof ROUTES)[RouteKey];
+
+/**
+ * Helper to build route with params
+ */
+export const buildRoute = (route: string, params: Record<string, string>): string => {
+  let path = route;
+  Object.entries(params).forEach(([key, value]) => {
+    path = path.replace(`:${key}`, value);
+  });
+  return path;
+};
+
+/**
+ * Navigation items for sidebar
+ */
+export interface NavItem {
+  label: string;
+  path: string;
+  icon: string; // lucide-react icon name
+  badge?: string | number;
+  children?: NavItem[];
+}
+
+export const NAV_ITEMS: NavItem[] = [
+  {
+    label: 'Dashboard',
+    path: ROUTES.DASHBOARD,
+    icon: 'LayoutDashboard',
+  },
+  {
+    label: 'Users',
+    path: ROUTES.USERS,
+    icon: 'Users',
+  },
+  {
+    label: 'Admins',
+    path: ROUTES.ADMINS,
+    icon: 'Shield',
+  },
+  {
+    label: 'Calls',
+    path: ROUTES.CALLS,
+    icon: 'Phone',
+  },
+  {
+    label: 'Campaigns',
+    path: ROUTES.CAMPAIGNS,
+    icon: 'Megaphone',
+    children: [
+      {
+        label: 'All Campaigns',
+        path: ROUTES.CAMPAIGNS,
+        icon: 'List',
+      },
+      {
+        label: 'Codes',
+        path: ROUTES.CODES,
+        icon: 'Hash',
+      },
+      {
+        label: 'Relationships',
+        path: ROUTES.RELATIONSHIPS,
+        icon: 'Link',
+      },
+    ],
+  },
+  {
+    label: 'Balances',
+    path: ROUTES.BALANCES,
+    icon: 'Wallet',
+  },
+  {
+    label: 'Analytics',
+    path: ROUTES.ANALYTICS,
+    icon: 'BarChart3',
+  },
+  {
+    label: 'Settings',
+    path: ROUTES.SETTINGS,
+    icon: 'Settings',
+  },
+  {
+    label: 'Exports',
+    path: ROUTES.EXPORTS,
+    icon: 'Download',
+  },
+];

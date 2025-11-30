@@ -40,6 +40,47 @@ global.IntersectionObserver = class IntersectionObserver {
   }
 } as unknown as typeof IntersectionObserver;
 
+vi.mock('@routes/routes.config', () => ({
+  ROUTES: {
+    DASHBOARD: '/dashboard',
+    USERS: '/users',
+    ADMINS: '/admins',
+    CALLS: '/calls',
+    CAMPAIGNS: '/campaigns',
+    CODES: '/codes',
+    RELATIONSHIPS: '/relationships',
+    BALANCES: '/balances',
+    SETTINGS: '/settings',
+    ANALYTICS: '/analytics',
+    EXPORTS: '/exports',
+    LOGIN: '/login',
+  },
+  NAV_ITEMS: [
+    {
+      label: 'Dashboard',
+      path: '/dashboard',
+      icon: 'LayoutDashboard',
+    },
+    {
+      label: 'Users',
+      path: '/users',
+      icon: 'Users',
+    },
+    {
+      label: 'Admins',
+      path: '/admins',
+      icon: 'Shield',
+    },
+  ],
+  buildRoute: (route: string, params: Record<string, string>) => {
+    let path = route;
+    Object.entries(params).forEach(([key, value]) => {
+      path = path.replace(`:${key}`, value);
+    });
+    return path;
+  },
+}));
+
 // Suppress Icon warnings in tests
 const originalWarn = console.warn;
 const originalError = console.error;

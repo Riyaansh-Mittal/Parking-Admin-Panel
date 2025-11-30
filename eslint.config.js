@@ -21,7 +21,9 @@ export default tseslint.config(
       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': [
         'warn',
-        { allowConstantExport: true },
+        { allowConstantExport: true,
+          allowExportNames: ['loader', 'action', 'ROUTES', 'NAV_ITEMS', 'buildRoute'],
+        },
       ],
       '@typescript-eslint/no-unused-vars': [
         'error',
@@ -29,6 +31,22 @@ export default tseslint.config(
       ],
       '@typescript-eslint/no-explicit-any': 'warn',
       'no-console': ['warn', { allow: ['warn', 'error'] }],
+    },
+  },
+  // ✅ Disable react-refresh rule for non-component files
+  {
+    files: [
+      '**/*.config.{ts,js}',
+      '**/routes/**/*.{ts,tsx}',
+      '**/types/**/*.{ts,tsx}',
+      '**/utils/**/*.{ts,tsx}',
+      '**/hooks/**/*.{ts,tsx}',
+      '**/api/**/*.{ts,tsx}',
+      '**/redux/**/*.{ts,tsx}',
+      '**/theme/**/*.{ts,tsx}',
+    ],
+    rules: {
+      'react-refresh/only-export-components': 'off',
     },
   }
 );

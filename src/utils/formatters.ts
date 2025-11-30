@@ -1,4 +1,4 @@
-import { format, formatDistanceToNow, parseISO } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 
 /**
  * Format date string to human-readable format
@@ -22,13 +22,41 @@ export const formatDateTime = (date: string | Date): string => {
 /**
  * Format relative time (e.g., "2 hours ago")
  */
-export const formatRelativeTime = (date: string | Date): string => {
-  try {
-    const dateObj = typeof date === 'string' ? parseISO(date) : date;
-    return formatDistanceToNow(dateObj, { addSuffix: true });
-  } catch {
-    return 'Invalid date';
+export const formatRelativeTime = (date: Date): string => {
+  const now = new Date();
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+  if (diffInSeconds < 60) {
+    return 'just now';
   }
+
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  if (diffInMinutes < 60) {
+    return `${diffInMinutes} ${diffInMinutes === 1 ? 'minute' : 'minutes'} ago`;
+  }
+
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  if (diffInHours < 24) {
+    return `${diffInHours} ${diffInHours === 1 ? 'hour' : 'hours'} ago`;
+  }
+
+  const diffInDays = Math.floor(diffInHours / 24);
+  if (diffInDays < 7) {
+    return `${diffInDays} ${diffInDays === 1 ? 'day' : 'days'} ago`;
+  }
+
+  const diffInWeeks = Math.floor(diffInDays / 7);
+  if (diffInWeeks < 4) {
+    return `${diffInWeeks} ${diffInWeeks === 1 ? 'week' : 'weeks'} ago`;
+  }
+
+  const diffInMonths = Math.floor(diffInDays / 30);
+  if (diffInMonths < 12) {
+    return `${diffInMonths} ${diffInMonths === 1 ? 'month' : 'months'} ago`;
+  }
+
+  const diffInYears = Math.floor(diffInDays / 365);
+  return `${diffInYears} ${diffInYears === 1 ? 'year' : 'years'} ago`;
 };
 
 /**
@@ -53,7 +81,7 @@ export const formatNumber = (num: number | string): string => {
 /**
  * Format percentage
  */
-export const formatPercentage = (value: number, decimals: number = 2): string => {
+export const formatPercentage = (value: number, decimals: number = 1): string => {
   return `${value.toFixed(decimals)}%`;
 };
 

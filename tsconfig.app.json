@@ -38,6 +38,7 @@
       "@utils": ["./src/utils/index.ts"],
       "@api/*": ["./src/api/*"],
       "@redux/*": ["./src/redux/*"],
+      "@routes/*": ["./src/routes/*"],
       "@types": ["./src/types/index.ts"],
       "@types/*": ["./src/types/*"],
       "@theme/*": ["./src/theme/*"],
