@@ -1,8 +1,11 @@
 import { useState, useCallback, useMemo } from 'react';
 
-export interface FilterValue {
-  [key: string]: any;
-}
+export type FilterValue = 
+  | string 
+  | number 
+  | boolean 
+  | string[] 
+  | { [key: string]: any };
 
 export interface UseFilterOptions {
   initialFilters?: FilterValue;
