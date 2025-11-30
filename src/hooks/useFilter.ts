@@ -4,17 +4,23 @@ export type FilterValue =
   | string 
   | number 
   | boolean 
+  | null
   | string[] 
-  | { [key: string]: any };
+  | number[]
+  | { [key: string]: string | number | boolean | null };
+
+export interface FilterState {
+  [key: string]: FilterValue;
+}
 
 export interface UseFilterOptions {
-  initialFilters?: FilterValue;
-  onFilterChange?: (filters: FilterValue) => void;
+  initialFilters?: FilterState;
+  onFilterChange?: (filters: FilterState) => void;
 }
 
 export interface UseFilterReturn {
-  filters: FilterValue;
-  setFilter: (key: string, value: any) => void;
+  filters: FilterState;
+  setFilter: (key: string, value: FilterValue) => void;
   removeFilter: (key: string) => void;
   clearFilters: () => void;
   hasActiveFilters: boolean;
@@ -25,10 +31,10 @@ export function useFilter({
   initialFilters = {},
   onFilterChange,
 }: UseFilterOptions = {}): UseFilterReturn {
-  const [filters, setFilters] = useState<FilterValue>(initialFilters);
+  const [filters, setFilters] = useState<FilterState>(initialFilters);
 
   const setFilter = useCallback(
-    (key: string, value: any) => {
+    (key: string, value: FilterValue) => {
       setFilters((prev) => {
         const newFilters = { ...prev, [key]: value };
         onFilterChange?.(newFilters);

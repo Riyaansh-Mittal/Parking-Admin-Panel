@@ -38,14 +38,14 @@ global.IntersectionObserver = class IntersectionObserver {
   takeRecords() {
     return [];
   }
-} as any;
+} as unknown as typeof IntersectionObserver;
 
 // Suppress Icon warnings in tests
 const originalWarn = console.warn;
 const originalError = console.error;
 
 beforeAll(() => {
-  console.warn = (...args: any[]) => {
+  console.warn = (...args: unknown[]) => {
     const message = String(args[0]);
     if (message.includes('Icon "') || message.includes('not found in lucide-react')) {
       return;
@@ -53,7 +53,7 @@ beforeAll(() => {
     originalWarn.call(console, ...args);
   };
 
-  console.error = (...args: any[]) => {
+  console.error = (...args: unknown[]) => {
     const message = String(args[0]);
     if (
       message.includes('Warning: ReactDOM.render') ||
