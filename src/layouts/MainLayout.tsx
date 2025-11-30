@@ -1,33 +1,23 @@
-import { ReactNode, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Sidebar } from '@components/organisms/Sidebar';
 import { TopBar } from '@components/organisms/TopBar';
 import { useAppSelector } from '@redux/hooks';
 import { cn } from '@utils';
 
-interface MainLayoutProps {
-  children?: ReactNode;
-}
-
-export const MainLayout = ({ children }: MainLayoutProps) => {
+export const MainLayout = () => {
   const { sidebarCollapsed } = useAppSelector((state) => state.ui);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen bg-slate-50">
-      {/* Sidebar */}
+    <div className="flex h-screen overflow-hidden bg-slate-50">
       <Sidebar />
       
-      {/* Main Content */}
-      <div className="flex flex-1 flex-col overflow-hidden lg:ml-0">
-        {/* TopBar */}
+      <div className="flex flex-1 flex-col overflow-hidden">
         <TopBar />
         
-        {/* Page Content */}
         <main
           className={cn(
-            'flex-1 overflow-y-auto p-6',
-            sidebarCollapsed ? 'lg:ml-20' : 'lg:ml-64'
+            'flex-1 overflow-y-auto p-4 transition-all duration-300 lg:p-6',
+            sidebarCollapsed ? 'lg:ml-0' : 'lg:ml-0'
           )}
         >
           <Outlet />

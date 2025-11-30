@@ -1,86 +1,64 @@
 import { ReactNode } from 'react';
-import { DataTable } from '@components/organisms/DataTable';
+import { Card } from '@components/organisms/Card';
+import { SearchBar } from '@components/molecules/SearchBar';
 import { Icon } from '@components/atoms/Icon';
-import { Card, CardBody } from '@components/organisms/Card';
-import { BulkActionBar } from '@components/organisms/BulkActionBar';
-import type { TableConfig } from '@types';
+import { cn } from '@utils';
 
-interface ListLayoutProps<T = Record<string, unknown>> {
+interface ListLayoutProps {
   title: string;
-  tableConfig: TableConfig<T>;
-  selectedRows: string[];
-  onRowSelect: (selectedIds: string[]) => void;
+  description?: string;
+  children: ReactNode;
   actions?: ReactNode;
-  filters?: ReactNode;
-  headerActions?: ReactNode;
-  bulkActions?: Array<{
-    label: string;
-    onClick: () => void;
-    variant?: 'primary' | 'secondary' | 'danger';
-    disabled?: boolean;
-  }>;
+  showSearch?: boolean;
+  onSearch?: (query: string) => void;
+  searchPlaceholder?: string;
+  loading?: boolean;
+  className?: string;
 }
 
-export const ListLayout = <T extends Record<string, unknown>>({
+export const ListLayout = ({
   title,
-  tableConfig,
-  selectedRows,
-  onRowSelect,
+  description,
+  children,
   actions,
-  filters,
-  headerActions,
-  bulkActions = [],
-}: ListLayoutProps<T>) => {
-  const handleClearSelection = () => {
-    onRowSelect([]);
-  };
-
+  showSearch = false,
+  onSearch,
+  searchPlaceholder = 'Search...',
+  loading = false,
+  className,
+}: ListLayoutProps) => {
   return (
-    <div className="space-y-6">
+    <div className={cn('space-y-6', className)}>
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
           <h1 className="text-2xl font-bold text-slate-900">{title}</h1>
-          {selectedRows.length > 0 && (
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 text-indigo-600">
-              <Icon name="CheckSquare" size="sm" />
-            </div>
+          {description && (
+            <p className="mt-1 text-sm text-slate-600">{description}</p>
           )}
         </div>
-        
-        <div className="flex items-center gap-3">
-          {headerActions}
-          {actions}
-        </div>
+        {actions && <div className="flex items-center gap-2">{actions}</div>}
       </div>
 
-      {/* Filters */}
-      {filters}
+      {/* Search Bar */}
+      {showSearch && onSearch && (
+        <SearchBar
+          onSearch={onSearch}
+          placeholder={searchPlaceholder}
+          fullWidth
+        />
+      )}
 
-      {/* Table Card */}
-      <Card>
-        <CardBody className="p-0">
-          <DataTable
-            {...tableConfig}
-            selectable
-            selectedRows={selectedRows}
-            onRowSelect={onRowSelect}
-          />
-        </CardBody>
+      {/* Content */}
+      <Card padding={false}>
+        {loading ? (
+          <div className="flex items-center justify-center p-12">
+            <Icon name="Loader" className="animate-spin text-slate-400" size="lg" />
+          </div>
+        ) : (
+          children
+        )}
       </Card>
-
-      {/* Bulk Actions */}
-      <BulkActionBar
-        selectedCount={selectedRows.length}
-        totalCount={tableConfig.data.length}
-        actions={bulkActions.map((action) => ({
-          label: action.label,
-          onClick: action.onClick,
-          variant: action.variant,
-          disabled: action.disabled,
-        }))}
-        onClearSelection={handleClearSelection}
-      />
     </div>
   );
 };

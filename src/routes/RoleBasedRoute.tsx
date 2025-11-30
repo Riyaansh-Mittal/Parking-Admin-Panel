@@ -3,19 +3,31 @@ import { useAppSelector } from '@redux/hooks';
 import { ROUTES } from './routes.config';
 
 interface RoleBasedRouteProps {
-  requiredRole: 'admin' | 'superuser';
+  allowedRoles?: string[];
+  requireSuperuser?: boolean;
 }
 
-export const RoleBasedRoute = ({ requiredRole }: RoleBasedRouteProps) => {
-  const { isAuthenticated, user } = useAppSelector((state) => state.auth);
+export const RoleBasedRoute = ({
+  allowedRoles = [],
+  requireSuperuser = false,
+}: RoleBasedRouteProps) => {
+  const { user } = useAppSelector((state) => state.auth);
 
-  if (!isAuthenticated) {
+  if (!user) {
     return <Navigate to={ROUTES.LOGIN} replace />;
   }
 
-  if (requiredRole === 'superuser' && !user?.is_superuser) {
+  // Check superuser requirement
+  if (requireSuperuser && !user.is_superuser) {
     return <Navigate to={ROUTES.UNAUTHORIZED} replace />;
   }
 
-  return <Outlet />; // ✅ No children prop needed
+  // Check role-based access
+  if (allowedRoles.length > 0 && !allowedRoles.includes(user.user_type)) {
+    return <Navigate to={ROUTES.UNAUTHORIZED} replace />;
+  }
+
+  return <Outlet />;
 };
+
+RoleBasedRoute.displayName = 'RoleBasedRoute';
