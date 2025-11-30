@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { Input } from './Input';
 
 describe('Input', () => {
@@ -9,27 +10,20 @@ describe('Input', () => {
   });
 
   it('applies error styles when error prop is true', () => {
-    render(<Input error placeholder="Error input" />);
+    render(<Input placeholder="Error input" error />);
     const input = screen.getByPlaceholderText('Error input');
     expect(input).toHaveClass('border-rose-500');
   });
 
-  it('displays helper text', () => {
-    render(<Input helperText="This is helper text" />);
-    expect(screen.getByText('This is helper text')).toBeInTheDocument();
-  });
-
-  it('displays error helper text with error styling', () => {
-    render(<Input error helperText="This is an error" />);
-    const helperText = screen.getByText('This is an error');
-    expect(helperText).toHaveClass('text-rose-500');
-  });
-
-  it('handles onChange events', () => {
+  it('handles onChange events', async () => {
     const handleChange = vi.fn();
+    const user = userEvent.setup();
+    
     render(<Input onChange={handleChange} />);
+    
     const input = screen.getByRole('textbox');
-    fireEvent.change(input, { target: { value: 'test' } });
+    await user.type(input, 'test');
+    
     expect(handleChange).toHaveBeenCalled();
   });
 
@@ -38,23 +32,45 @@ describe('Input', () => {
     expect(screen.getByRole('textbox')).toBeDisabled();
   });
 
-  it('renders with left icon', () => {
-    render(
-      <Input leftIcon={<span data-testid="left-icon">🔍</span>} />
-    );
-    expect(screen.getByTestId('left-icon')).toBeInTheDocument();
-  });
-
-  it('renders with right icon', () => {
-    render(
-      <Input rightIcon={<span data-testid="right-icon">✓</span>} />
-    );
-    expect(screen.getByTestId('right-icon')).toBeInTheDocument();
-  });
-
   it('applies fullWidth class', () => {
-    render(<Input fullWidth data-testid="input" />);
-    const inputWrapper = screen.getByTestId('input').parentElement;
-    expect(inputWrapper).toHaveClass('w-full');
+    render(<Input data-testid="input" fullWidth />);
+    const input = screen.getByTestId('input');
+    expect(input).toHaveClass('w-full');
+  });
+
+  it('accepts ref', () => {
+    const ref = { current: null };
+    render(<Input ref={ref} />);
+    expect(ref.current).toBeInstanceOf(HTMLInputElement);
+  });
+
+  it('applies custom className', () => {
+    render(<Input className="custom-class" data-testid="input" />);
+    const input = screen.getByTestId('input');
+    expect(input).toHaveClass('custom-class');
+  });
+
+  it('renders different input types', () => {
+    const { rerender } = render(<Input type="password" data-testid="input" />);
+    expect(screen.getByTestId('input')).toHaveAttribute('type', 'password');
+
+    rerender(<Input type="email" data-testid="input" />);
+    expect(screen.getByTestId('input')).toHaveAttribute('type', 'email');
+  });
+
+  it('forwards all input props', () => {
+    render(
+      <Input
+        data-testid="input"
+        maxLength={10}
+        autoComplete="off"
+        required
+      />
+    );
+    
+    const input = screen.getByTestId('input');
+    expect(input).toHaveAttribute('maxLength', '10');
+    expect(input).toHaveAttribute('autoComplete', 'off');
+    expect(input).toBeRequired();
   });
 });

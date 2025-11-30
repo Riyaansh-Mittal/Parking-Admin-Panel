@@ -1,67 +1,61 @@
-import { useState, useCallback, InputHTMLAttributes } from 'react';
-import { Input } from '@components/atoms/Input';
+import { useState, useEffect, ChangeEvent } from 'react';
+import { InputField } from '@components/molecules/InputField';
 import { Icon } from '@components/atoms/Icon';
-import { useDebounce } from '@hooks';
-import { cn } from '@utils';
 
-export interface SearchBarProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
-  onSearch: (query: string) => void;
+export interface SearchBarProps {
+  onSearch: (value: string) => void;
+  placeholder?: string;
   debounceMs?: number;
   showClearButton?: boolean;
-  fullWidth?: boolean;
+  fullWidth?: boolean; // ✅ Add this prop
 }
 
 export const SearchBar = ({
   onSearch,
+  placeholder = 'Search...',
   debounceMs = 300,
   showClearButton = true,
-  fullWidth = false,
-  placeholder = 'Search...',
-  className,
-  ...props
+  fullWidth = false, // ✅ Default value
 }: SearchBarProps) => {
-  const [query, setQuery] = useState('');
-  const debouncedQuery = useDebounce(query, debounceMs);
+  const [value, setValue] = useState('');
 
-  // Trigger search when debounced query changes
-  useCallback(() => {
-    onSearch(debouncedQuery);
-  }, [debouncedQuery, onSearch])();
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onSearch(value);
+    }, debounceMs);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setQuery(e.target.value);
+    return () => clearTimeout(timer);
+  }, [value, debounceMs, onSearch]);
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setValue(e.target.value);
   };
 
   const handleClear = () => {
-    setQuery('');
-    onSearch('');
+    setValue('');
   };
 
+  const rightIcon = showClearButton && value ? (
+    <button
+      onClick={handleClear}
+      aria-label="Clear search"
+      className="cursor-pointer text-slate-400 hover:text-slate-600"
+      type="button"
+    >
+      <Icon name="X" size="sm" />
+    </button>
+  ) : undefined;
+
   return (
-    <div className={cn('relative', fullWidth && 'w-full', className)}>
-      <Input
-        type="text"
-        value={query}
-        onChange={handleChange}
-        placeholder={placeholder}
-        leftIcon={<Icon name="Search" size="sm" />}
-        rightIcon={
-          showClearButton && query ? (
-            <button
-              type="button"
-              onClick={handleClear}
-              className="text-slate-400 hover:text-slate-600"
-              aria-label="Clear search"
-            >
-              <Icon name="X" size="sm" />
-            </button>
-          ) : undefined
-        }
-        fullWidth={fullWidth}
-        {...props}
-      />
-    </div>
+    <InputField
+      type="text"
+      placeholder={placeholder}
+      value={value}
+      onChange={handleChange}
+      leftIcon={<Icon name="Search" size="sm" />}
+      rightIcon={rightIcon}
+      fullWidth={fullWidth} // ✅ Pass it through to InputField
+    />
   );
 };
 
