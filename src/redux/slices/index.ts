@@ -1,0 +1,12 @@
+export { default as authReducer } from './authSlice';
+export { default as uiReducer } from './uiSlice';
+export { default as usersReducer } from './usersSlice';
+export { default as adminsReducer } from './adminsSlice';
+export { default as callsReducer } from './callsSlice';
+export { default as campaignsReducer } from './campaignsSlice';
+export { default as codesReducer } from './codesSlice';
+export { default as relationshipsReducer } from './relationshipsSlice';
+export { default as balancesReducer } from './balancesSlice';
+export { default as settingsReducer } from './settingsSlice';
+export { default as analyticsReducer } from './analyticsSlice';
+export { default as notificationReducer } from './notificationSlice';
