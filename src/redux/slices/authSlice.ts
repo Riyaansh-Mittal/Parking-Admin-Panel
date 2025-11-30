@@ -4,6 +4,7 @@ import { storage } from '@utils/storageHelper';
 import { STORAGE_KEYS } from '@utils/constants';
 import { getErrorMessage } from '@utils/errorHandler';
 import type { LoginRequest, LoginResponse } from '@api/services/auth.service';
+import type { RootState } from '../store';
 
 export interface AuthState {
   isAuthenticated: boolean;
@@ -209,6 +210,11 @@ const authSlice = createSlice({
       });
   },
 });
+
+// Add these to your existing authSlice
+export const selectIsAuthenticated = (state: RootState) => state.auth.isAuthenticated;
+export const selectUser = (state: RootState) => state.auth.user;
+export const selectIsSuperuser = (state: RootState) => state.auth.user?.is_superuser ?? false;
 
 export const { setTokens, clearAuth, clearError } = authSlice.actions;
 export default authSlice.reducer;

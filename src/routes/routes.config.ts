@@ -52,7 +52,7 @@ export const ROUTES = {
   // Exports
   EXPORTS: '/exports',
   
-  // Error pages
+  // Errors
   NOT_FOUND: '/404',
   UNAUTHORIZED: '/403',
 } as const;

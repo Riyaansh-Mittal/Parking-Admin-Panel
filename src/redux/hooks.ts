@@ -10,3 +10,7 @@ export const useAppDispatch = (): AppDispatch => useDispatch<AppDispatch>();
  * Typed useSelector hook
  */
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
+
+// Add these exports
+export { selectIsAuthenticated, selectUser, selectIsSuperuser } from '@redux/slices/authSlice';
+
