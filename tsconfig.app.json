@@ -32,6 +32,7 @@
       "@/*": ["./src/*"],
       "@components/*": ["./src/components/*"],
       "@features/*": ["./src/features/*"],
+      "@hooks": ["./src/hooks/index.ts"],
       "@hooks/*": ["./src/hooks/*"],
       "@utils/*": ["./src/utils/*"],
       "@utils": ["./src/utils/index.ts"],
