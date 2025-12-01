@@ -1,61 +1,53 @@
-import { get } from '../client';
+import { get, post } from '../client';
 import type { ApiResponse, PaginatedApiResponse } from '../types';
+import type {
+  CallListItem,
+  CallDetail,
+  CallEvent,
+  CallFilters,
+  CallEventFilters,
+  CallSummaryStats,
+  UserCallStats,
+  CallAnalytics,
+  BulkActionPayload,
+  BulkActionResponse,
+  ExportRequest,
+  ExportTaskResponse,
+  ExportNoDataResponse,
+  StatsDateRange,
+} from '@/features/calls/types';
 
-export interface Call {
-  call_id: string;
-  inviter: {
-    user_id: string;
-    email: string;
-    full_name: string;
-  };
-  invitee: {
-    user_id: string;
-    email: string;
-    full_name: string;
-  };
-  call_type: 'audio' | 'video';
-  state: string;
-  initiated_at: string;
-  ended_at: string | null;
-  duration: number;
-  was_connected: boolean;
-  call_cost: string;
-  deduction_status: string;
-  call_quality_rating: number | null;
-  created_at: string;
-}
+// Re-export types for backward compatibility
+export type { CallListItem as Call, CallFilters };
 
-export interface CallFilters {
-  page?: number;
-  page_size?: number;
-  search?: string;
-  ordering?: string;
-  state?: string;
-  call_type?: string;
-  deduction_status?: string;
-  was_connected?: boolean;
-  min_duration?: number;
-  max_duration?: number;
-  initiated_after?: string;
-  initiated_before?: string;
-}
+const BASE_PATH = '/call/admin';
+
+/**
+ * Build query string from filters object
+ * Uses generic to accept any object type while maintaining type safety
+ */
+const buildQueryString = <T extends object>(filters?: T): string => {
+  if (!filters) return '';
+
+  const params = new URLSearchParams();
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      params.append(key, String(value));
+    }
+  });
+
+  const queryString = params.toString();
+  return queryString ? `?${queryString}` : '';
+};
 
 /**
  * Get paginated list of calls
  */
 export const getCalls = async (
   filters?: CallFilters
-): Promise<PaginatedApiResponse<Call>> => {
-  const params = new URLSearchParams();
-  if (filters) {
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        params.append(key, String(value));
-      }
-    });
-  }
-  return get<PaginatedApiResponse<Call>>(
-    `/call/admin/calls/?${params.toString()}`
+): Promise<PaginatedApiResponse<CallListItem>> => {
+  return get<PaginatedApiResponse<CallListItem>>(
+    `${BASE_PATH}/calls/${buildQueryString(filters)}`
   );
 };
 
@@ -64,22 +56,102 @@ export const getCalls = async (
  */
 export const getCallDetail = async (
   callId: string
-): Promise<ApiResponse<Call>> => {
-  return get<ApiResponse<Call>>(`/call/admin/calls/${callId}/`);
+): Promise<ApiResponse<CallDetail>> => {
+  return get<ApiResponse<CallDetail>>(`${BASE_PATH}/calls/${callId}/`);
+};
+
+/**
+ * Get call event logs
+ */
+export const getCallEvents = async (
+  callId: string,
+  filters?: CallEventFilters
+): Promise<PaginatedApiResponse<CallEvent>> => {
+  return get<PaginatedApiResponse<CallEvent>>(
+    `${BASE_PATH}/calls/${callId}/events/${buildQueryString(filters)}`
+  );
 };
 
 /**
  * Get call summary statistics
  */
-export const getCallStats = async (params?: {
-  start_date?: string;
-  end_date?: string;
-}): Promise<ApiResponse<unknown>> => {
-  const queryParams = new URLSearchParams();
-  if (params?.start_date) queryParams.append('start_date', params.start_date);
-  if (params?.end_date) queryParams.append('end_date', params.end_date);
-  
-  return get<ApiResponse<unknown>>(
-    `/call/admin/calls/stats/summary/?${queryParams.toString()}`
+export const getCallStats = async (
+  params?: StatsDateRange
+): Promise<ApiResponse<CallSummaryStats>> => {
+  return get<ApiResponse<CallSummaryStats>>(
+    `${BASE_PATH}/calls/stats/summary/${buildQueryString(params)}`
   );
+};
+
+/**
+ * Get user call statistics
+ */
+export const getUserCallStats = async (params?: {
+  page?: number;
+  page_size?: number;
+  ordering?: string;
+}): Promise<PaginatedApiResponse<UserCallStats>> => {
+  return get<PaginatedApiResponse<UserCallStats>>(
+    `${BASE_PATH}/calls/stats/users/${buildQueryString(params)}`
+  );
+};
+
+/**
+ * Get admin call analytics
+ */
+export const getCallAnalytics = async (
+  params?: StatsDateRange
+): Promise<ApiResponse<CallAnalytics>> => {
+  return get<ApiResponse<CallAnalytics>>(
+    `${BASE_PATH}/analytics/${buildQueryString(params)}`
+  );
+};
+
+/**
+ * Perform bulk action on calls
+ */
+export const bulkAction = async (
+  payload: BulkActionPayload
+): Promise<ApiResponse<BulkActionResponse>> => {
+  return post<ApiResponse<BulkActionResponse>>(
+    `${BASE_PATH}/calls/bulk-action/`,
+    payload
+  );
+};
+
+/**
+ * Start call data export
+ */
+export const startExport = async (
+  payload: ExportRequest
+): Promise<ApiResponse<ExportTaskResponse | ExportNoDataResponse> | Blob> => {
+  const response = await post<ApiResponse<ExportTaskResponse | ExportNoDataResponse> | Blob>(
+    `${BASE_PATH}/calls/export/`,
+    payload
+  );
+  return response;
+};
+
+/**
+ * Download export file or check status
+ */
+export const downloadExport = async (
+  taskId: string
+): Promise<ApiResponse<ExportTaskResponse> | Blob> => {
+  return get<ApiResponse<ExportTaskResponse> | Blob>(
+    `${BASE_PATH}/calls/exports/${taskId}/download/`
+  );
+};
+
+// Default export for backward compatibility
+export default {
+  getCalls,
+  getCallDetail,
+  getCallEvents,
+  getCallStats,
+  getUserCallStats,
+  getCallAnalytics,
+  bulkAction,
+  startExport,
+  downloadExport,
 };
