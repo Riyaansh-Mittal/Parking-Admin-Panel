@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { MainLayout } from '@layouts/MainLayout';
-import { AuthLayout } from '@layouts/AuthLayout';
+import { MainLayout } from '@/layouts/MainLayout';
+import { AuthLayout } from '@/layouts/AuthLayout';
 import { ProtectedRoute } from './ProtectedRoute';
 import { RoleBasedRoute } from './RoleBasedRoute';
 import { ROUTES } from './routes.config';
@@ -13,7 +13,10 @@ import {
   DashboardPage,
   NotFoundPage,
   UnauthorizedPage,
-} from '@pages';
+} from '@/pages';
+
+// Feature pages
+import { UsersListPage, UserDetailPage } from '@/features/users/pages';
 
 export const AppRoutes = () => {
   return (
@@ -32,7 +35,13 @@ export const AppRoutes = () => {
       <Route element={<ProtectedRoute />}>
         <Route element={<MainLayout />}>
           <Route path={ROUTES.DASHBOARD} element={<DashboardPage />} />
-          <Route path={ROUTES.USERS} element={<div>Users Page</div>} />
+          
+          {/* Users Routes (Admin + Superuser) */}
+          <Route element={<RoleBasedRoute requiredRole="admin" />}>
+            <Route path={ROUTES.USERS} element={<UsersListPage />} />
+            <Route path={ROUTES.USER_DETAIL} element={<UserDetailPage />} />
+          </Route>
+          
           <Route path={ROUTES.CALLS} element={<div>Calls Page</div>} />
           <Route path={ROUTES.CAMPAIGNS} element={<div>Campaigns Page</div>} />
           

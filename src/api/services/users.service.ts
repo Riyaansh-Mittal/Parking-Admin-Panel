@@ -1,91 +1,103 @@
-import { get, patch } from '../client';
-import type { ApiResponse, PaginatedApiResponse } from '../types';
-import type { User } from '@types'; // instead of '@types/common.types'
+import apiClient from '@/api/client';
+import type {
+  PaginatedUsersResponse,
+  UserDetailResponse,
+  UserStatsResponse,
+  UpdateUserPayload,
+  UpdateUserStatusPayload,
+  UserFilters,
+  ExportUsersPayload,
+  ExportTask,
+} from '@/features/users/types';
+import type { ApiResponse } from '@/types/api.types';
 
-export interface UserFilters {
-  page?: number;
-  page_size?: number;
-  is_active?: boolean;
-  email_verified?: boolean;
-  phone_verified?: boolean;
-  has_vehicle?: boolean;
-  search?: string;
-  ordering?: string;
-}
+const USERS_BASE = '/auth/admin/users';
+const EXPORTS_BASE = '/auth/admin/exports';
 
-export interface UserStats {
-  overview: {
-    total: number;
-    active: number;
-    inactive: number;
-    fully_verified: number;
-  };
-  verification: {
-    email_verified: number;
-    email_unverified: number;
-    phone_verified: number;
-    phone_unverified: number;
-  };
-  vehicles: {
-    with_vehicle: number;
-    without_vehicle: number;
-  };
-  profiles: {
-    complete: number;
-    incomplete: number;
-  };
-  recent: {
-    last_7_days: number;
-    last_30_days: number;
-  };
-  generated_at: string;
-}
-
-/**
- * Get paginated list of regular users
- */
-export const getUsers = async (
-  filters?: UserFilters
-): Promise<PaginatedApiResponse<User>> => {
-  const params = new URLSearchParams();
-  if (filters) {
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        params.append(key, String(value));
-      }
+export const usersService = {
+  // List regular users with filters and pagination
+  async listUsers(params: {
+    page?: number;
+    page_size?: number;
+    filters?: UserFilters;
+  }): Promise<PaginatedUsersResponse> {
+    const { page = 1, page_size = 20, filters = {} } = params;
+    
+    const queryParams = new URLSearchParams({
+      page: page.toString(),
+      page_size: page_size.toString(),
+      ...Object.entries(filters).reduce((acc, [key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          acc[key] = String(value);
+        }
+        return acc;
+      }, {} as Record<string, string>),
     });
-  }
-  return get<PaginatedApiResponse<User>>(
-    `/auth/admin/users/regular/?${params.toString()}`
-  );
-};
 
-/**
- * Get user detail by ID
- */
-export const getUserDetail = async (
-  userId: string
-): Promise<ApiResponse<User>> => {
-  return get<ApiResponse<User>>(`/auth/admin/users/${userId}/regular/`);
-};
+    const response = await apiClient.get<ApiResponse<PaginatedUsersResponse>>(
+      `${USERS_BASE}/regular/?${queryParams}`
+    );
 
-/**
- * Update user status
- */
-export const updateUserStatus = async (
-  userId: string,
-  isActive: boolean,
-  reason?: string
-): Promise<ApiResponse<User>> => {
-  return patch<ApiResponse<User>>(
-    `/auth/users/${userId}/status/`,
-    { is_active: isActive, reason }
-  );
-};
+    return response.data.data || response.data;
+  },
 
-/**
- * Get user statistics
- */
-export const getUserStats = async (): Promise<ApiResponse<UserStats>> => {
-  return get<ApiResponse<UserStats>>('/auth/admin/stats/regular/');
+  // Get user detail
+  async getUserDetail(userId: string): Promise<UserDetailResponse> {
+    const response = await apiClient.get<UserDetailResponse>(
+      `${USERS_BASE}/${userId}/regular/`
+    );
+    return response.data;
+  },
+
+  // Get user statistics
+  async getUserStats(): Promise<UserStatsResponse> {
+    const response = await apiClient.get<UserStatsResponse>('/auth/admin/stats/regular/');
+    return response.data;
+  },
+
+  // Update user
+  async updateUser(userId: string, data: UpdateUserPayload): Promise<UserDetailResponse> {
+    const response = await apiClient.patch<UserDetailResponse>(
+      `/auth/users/${userId}/update/`,
+      data
+    );
+    return response.data;
+  },
+
+  // Update user status
+  async updateUserStatus(
+    userId: string,
+    data: UpdateUserStatusPayload
+  ): Promise<UserDetailResponse> {
+    const response = await apiClient.patch<UserDetailResponse>(
+      `/auth/users/${userId}/status/`,
+      data
+    );
+    return response.data;
+  },
+
+  // Start export
+  async startExport(payload: ExportUsersPayload): Promise<ExportTask> {
+    const response = await apiClient.post<ApiResponse<ExportTask>>(
+      '/auth/admin/export/',
+      payload
+    );
+    return response.data.data;
+  },
+
+  // Check export status
+  async checkExportStatus(taskId: string): Promise<ExportTask> {
+    const response = await apiClient.get<ApiResponse<ExportTask>>(
+      `${EXPORTS_BASE}/${taskId}/status/`
+    );
+    return response.data.data;
+  },
+
+  // Download export
+  async downloadExport(taskId: string): Promise<Blob> {
+    const response = await apiClient.get(`${EXPORTS_BASE}/${taskId}/download/`, {
+      responseType: 'blob',
+    });
+    return response.data;
+  },
 };
