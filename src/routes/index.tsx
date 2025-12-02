@@ -18,6 +18,30 @@ import {
 // Feature pages
 import { UsersListPage, UserDetailPage } from '@/features/users/pages';
 
+// Calls pages
+import { 
+  CallsListPage, 
+  CallDetailPage, 
+  CallStatsPage 
+} from '@/features/calls/pages';
+
+// Campaigns pages
+import { 
+  CampaignsListPage, 
+  CampaignDetailPage, 
+  CreateCampaignPage 
+} from '@/features/campaigns/pages';
+
+// Codes pages
+import { CodesListPage } from '@/features/codes/pages';
+
+// Admins pages (Superuser only)
+import { 
+  AdminsListPage, 
+  AdminDetailPage, 
+  RegisterAdminPage 
+} from '@/features/admins/pages';
+
 export const AppRoutes = () => {
   return (
     <Routes>
@@ -34,20 +58,37 @@ export const AppRoutes = () => {
       {/* Protected Routes */}
       <Route element={<ProtectedRoute />}>
         <Route element={<MainLayout />}>
+          {/* Dashboard - Accessible to all authenticated users */}
           <Route path={ROUTES.DASHBOARD} element={<DashboardPage />} />
-          
-          {/* Users Routes (Admin + Superuser) */}
+
+          {/* Admin Access Routes */}
           <Route element={<RoleBasedRoute requiredRole="admin" />}>
+            {/* Calls Routes */}
+            <Route path={ROUTES.CALLS} element={<CallsListPage />} />
+            <Route path={ROUTES.CALL_DETAIL} element={<CallDetailPage />} />
+            <Route path={ROUTES.CALL_STATS} element={<CallStatsPage />} />
+
+            {/* Campaigns Routes */}
+            <Route path={ROUTES.CAMPAIGNS} element={<CampaignsListPage />} />
+            <Route path={ROUTES.CAMPAIGN_DETAIL} element={<CampaignDetailPage />} />
+            <Route path={ROUTES.CREATE_CAMPAIGN} element={<CreateCampaignPage />} />
+
+            {/* Codes Routes */}
+            <Route path={ROUTES.CODES} element={<CodesListPage />} />
+
+            {/* Users Routes */}
             <Route path={ROUTES.USERS} element={<UsersListPage />} />
             <Route path={ROUTES.USER_DETAIL} element={<UserDetailPage />} />
           </Route>
-          
-          <Route path={ROUTES.CALLS} element={<div>Calls Page</div>} />
-          <Route path={ROUTES.CAMPAIGNS} element={<div>Campaigns Page</div>} />
-          
+
           {/* Superuser Only Routes */}
           <Route element={<RoleBasedRoute requiredRole="superuser" />}>
-            <Route path={ROUTES.ADMINS} element={<div>Admins Page</div>} />
+            {/* Admins Management */}
+            <Route path={ROUTES.ADMINS} element={<AdminsListPage />} />
+            <Route path={ROUTES.ADMIN_DETAIL} element={<AdminDetailPage />} />
+            <Route path={ROUTES.REGISTER_ADMIN} element={<RegisterAdminPage />} />
+
+            {/* Settings */}
             <Route path={ROUTES.SETTINGS} element={<div>Settings Page</div>} />
           </Route>
         </Route>
@@ -60,5 +101,3 @@ export const AppRoutes = () => {
     </Routes>
   );
 };
-
-export default AppRoutes;

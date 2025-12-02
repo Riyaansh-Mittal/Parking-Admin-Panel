@@ -41,8 +41,6 @@
       "@redux/*": ["./src/redux/*"],
       "@routes": ["./src/routes/index.ts"],
       "@routes/*": ["./src/routes/*"],
-      "@page-layouts": ["./src/page-layouts/index.ts"],
-      "@page-layouts/*": ["./src/page-layouts/*"],
       "@types": ["./src/types/index.ts"],
       "@types/*": ["./src/types/*"],
       "@theme/*": ["./src/theme/*"],

@@ -307,3 +307,70 @@ export const DEDUCTION_STATUS_CONFIG: Record<DeductionStatus, { label: string; v
   failed: { label: 'Failed', variant: 'error' },
   not_applicable: { label: 'N/A', variant: 'neutral' },
 };
+
+// Add this interface for API response
+export interface CallApiResponse {
+  call_id: string;
+  inviter_email: string;
+  inviter_user_id: string;
+  invitee_email: string;
+  invitee_user_id: string;
+  call_type: CallType;
+  state: CallState;
+  duration: number;
+  call_cost: string;
+  deduction_status: DeductionStatus;
+  initiated_at: string;
+  ended_at: string | null;
+  call_quality_rating: number | null;
+  created_at: string;
+}
+
+// Add transformer function
+export const transformCallApiResponse = (apiCall: CallApiResponse): CallListItem => ({
+  call_id: apiCall.call_id,
+  inviter: {
+    user_id: apiCall.inviter_user_id,
+    email: apiCall.inviter_email,
+    full_name: apiCall.inviter_email.split('@')[0], // Extract username from email
+  },
+  invitee: {
+    user_id: apiCall.invitee_user_id,
+    email: apiCall.invitee_email,
+    full_name: apiCall.invitee_email.split('@')[0],
+  },
+  call_type: apiCall.call_type,
+  state: apiCall.state,
+  initiated_at: apiCall.initiated_at,
+  ended_at: apiCall.ended_at,
+  duration: apiCall.duration,
+  was_connected: apiCall.duration > 0,
+  call_cost: apiCall.call_cost,
+  deduction_status: apiCall.deduction_status,
+  call_quality_rating: apiCall.call_quality_rating,
+  created_at: apiCall.created_at,
+});
+
+export interface CallDetailApiResponse extends CallApiResponse {
+  deducted_from_base: string;
+  deducted_from_bonus: string;
+  inviter_rating: number | null;
+  invitee_rating: number | null;
+  inviter_feedback: string | null;
+  invitee_feedback: string | null;
+  updated_at: string;
+}
+
+// Transform detail API response
+export const transformCallDetailApiResponse = (
+  apiCall: CallDetailApiResponse
+): CallDetail => ({
+  ...transformCallApiResponse(apiCall), // Reuse base transformer
+  deducted_from_base: apiCall.deducted_from_base,
+  deducted_from_bonus: apiCall.deducted_from_bonus,
+  inviter_rating: apiCall.inviter_rating,
+  invitee_rating: apiCall.invitee_rating,
+  inviter_feedback: apiCall.inviter_feedback,
+  invitee_feedback: apiCall.invitee_feedback,
+  updated_at: apiCall.updated_at,
+});

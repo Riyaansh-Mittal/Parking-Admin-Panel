@@ -13,6 +13,7 @@ import type { CallDetail } from '../types';
 export const CallDetailPage = () => {
   const { callId } = useParams<{ callId: string }>();
   const navigate = useNavigate();
+
   const { call, loading, error } = useCallDetail(callId);
   const { events, loading: eventsLoading } = useCallEvents(callId);
 

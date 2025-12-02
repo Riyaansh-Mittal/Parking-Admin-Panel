@@ -2,7 +2,6 @@ import { get, post } from '../client';
 import type { ApiResponse, PaginatedApiResponse } from '../types';
 import type {
   CallListItem,
-  CallDetail,
   CallEvent,
   CallFilters,
   CallEventFilters,
@@ -15,7 +14,10 @@ import type {
   ExportTaskResponse,
   ExportNoDataResponse,
   StatsDateRange,
+  CallApiResponse
 } from '@/features/calls/types';
+
+import { CallDetailApiResponse } from '@/features/calls/types/call.types'; // ← Import CallDetailApiResponse
 
 // Re-export types for backward compatibility
 export type { CallListItem as Call, CallFilters };
@@ -45,8 +47,8 @@ const buildQueryString = <T extends object>(filters?: T): string => {
  */
 export const getCalls = async (
   filters?: CallFilters
-): Promise<PaginatedApiResponse<CallListItem>> => {
-  return get<PaginatedApiResponse<CallListItem>>(
+): Promise<PaginatedApiResponse<CallApiResponse>> => {
+  return get<PaginatedApiResponse<CallApiResponse>>(
     `${BASE_PATH}/calls/${buildQueryString(filters)}`
   );
 };
@@ -56,8 +58,10 @@ export const getCalls = async (
  */
 export const getCallDetail = async (
   callId: string
-): Promise<ApiResponse<CallDetail>> => {
-  return get<ApiResponse<CallDetail>>(`${BASE_PATH}/calls/${callId}/`);
+): Promise<ApiResponse<CallDetailApiResponse>> => {  // ← Change CallDetail to CallDetailApiResponse
+  return get<ApiResponse<CallDetailApiResponse>>(
+    `${BASE_PATH}/calls/${callId}/`
+  );
 };
 
 /**

@@ -10,21 +10,21 @@ export const ROUTES = {
   
   // Users
   USERS: '/users',
-  USER_DETAIL: '/users/:id',
+  USER_DETAIL: '/users/:userId',
   
   // Admins
   ADMINS: '/admins',
-  ADMIN_DETAIL: '/admins/:id',
+  ADMIN_DETAIL: '/admins/:adminId',
   REGISTER_ADMIN: '/admins/register',
   
   // Calls
   CALLS: '/calls',
-  CALL_DETAIL: '/calls/:id',
+  CALL_DETAIL: '/calls/:callId',
   CALL_STATS: '/calls/stats',
   
   // Campaigns
   CAMPAIGNS: '/campaigns',
-  CAMPAIGN_DETAIL: '/campaigns/:id',
+  CAMPAIGN_DETAIL: '/campaigns/:campaignId',
   CREATE_CAMPAIGN: '/campaigns/create',
   
   // Codes

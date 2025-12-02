@@ -1,12 +1,16 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import * as callsService from '@api/services/calls.service';
 import { getErrorMessage } from '@utils/errorHandler';
-import type { Call, CallFilters } from '@api/services/calls.service';
-import type { PaginatedApiResponse } from '@api/types';
+import { transformCallApiResponse, transformCallDetailApiResponse } from '@/features/calls/types/call.types'; // Add this import
+import type {
+  CallListItem,
+  CallFilters,
+  CallDetail,
+} from '@/features/calls/types/call.types'; // Update imports
 
 export interface CallsState {
-  calls: Call[];
-  currentCall: Call | null;
+  calls: CallListItem[];
+  currentCall: CallDetail | null;
   stats: unknown | null;
   pagination: {
     count: number;
@@ -45,7 +49,11 @@ export const fetchCalls = createAsyncThunk(
   async (filters: CallFilters | undefined, { rejectWithValue }) => {
     try {
       const response = await callsService.getCalls(filters);
-      return response;
+      // Transform the data here before returning
+      return {
+        ...response,
+        data: response.data.map(transformCallApiResponse),
+      };
     } catch (error) {
       return rejectWithValue(getErrorMessage(error));
     }
@@ -60,7 +68,9 @@ export const fetchCallDetail = createAsyncThunk(
   async (callId: string, { rejectWithValue }) => {
     try {
       const response = await callsService.getCallDetail(callId);
-      return response.data;
+
+      // Use the detail transformer if endpoint returns extra fields
+      return transformCallDetailApiResponse(response.data || response);
     } catch (error) {
       return rejectWithValue(getErrorMessage(error));
     }
@@ -106,19 +116,17 @@ const callsSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(
-        fetchCalls.fulfilled,
-        (state, action: PayloadAction<PaginatedApiResponse<Call>>) => {
-          state.loading = false;
-          state.calls = action.payload.data;
-          state.pagination = {
-            count: action.payload.pagination.count,
-            currentPage: action.payload.pagination.current_page,
-            totalPages: action.payload.pagination.total_pages,
-            pageSize: action.payload.pagination.page_size,
-          };
-        }
-      )
+      .addCase(fetchCalls.fulfilled, (state, action) => {
+        state.loading = false;
+        // Data is already transformed
+        state.calls = action.payload.data;
+        state.pagination = {
+          count: action.payload.pagination.count,
+          currentPage: action.payload.pagination.current_page,
+          totalPages: action.payload.pagination.total_pages,
+          pageSize: action.payload.pagination.page_size,
+        };
+      })
       .addCase(fetchCalls.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
@@ -132,7 +140,7 @@ const callsSlice = createSlice({
       })
       .addCase(
         fetchCallDetail.fulfilled,
-        (state, action: PayloadAction<Call>) => {
+        (state, action: PayloadAction<CallDetail>) => {
           state.loading = false;
           state.currentCall = action.payload;
         }
