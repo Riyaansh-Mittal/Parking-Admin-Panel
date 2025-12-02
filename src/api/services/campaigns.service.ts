@@ -1,38 +1,36 @@
 import { get, post, patch } from '../client';
 import type { ApiResponse, PaginatedApiResponse } from '../types';
+import type {
+  Campaign,
+  CampaignDetail,
+  CampaignFilters,
+  CreateCampaignPayload,
+  UpdateCampaignPayload,
+  DeactivateCampaignPayload,
+  DeactivateCampaignResponse,
+  GenerateCodesPayload,
+  GenerateCodesResponse,
+  CampaignPerformance,
+} from '@/features/campaigns/types';
 
-export interface Campaign {
-  id: string;
-  name: string;
-  description: string;
-  reward_for_referrer: string;
-  reward_for_referred: string;
-  codes_generated: number;
-  codes_redeemed: number;
-  valid_from: string;
-  valid_until: string;
-  is_expired: boolean;
-  is_active: boolean;
-  created_by_email: string;
-  created_at: string;
-}
+const BASE_PATH = '/referral/v1/admin/campaigns';
 
-export interface CampaignFilters {
-  page?: number;
-  page_size?: number;
-  is_active?: boolean;
-  search?: string;
-  ordering?: string;
-}
+/**
+ * Build query string from filters
+ */
+const buildQueryString = <T extends object>(filters?: T): string => {
+  if (!filters) return '';
 
-export interface CreateCampaignRequest {
-  name: string;
-  description: string;
-  reward_for_referrer: number;
-  reward_for_referred: number;
-  valid_from: string;
-  valid_until: string;
-}
+  const params = new URLSearchParams();
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      params.append(key, String(value));
+    }
+  });
+
+  const queryString = params.toString();
+  return queryString ? `?${queryString}` : '';
+};
 
 /**
  * Get paginated list of campaigns
@@ -40,16 +38,8 @@ export interface CreateCampaignRequest {
 export const getCampaigns = async (
   filters?: CampaignFilters
 ): Promise<PaginatedApiResponse<Campaign>> => {
-  const params = new URLSearchParams();
-  if (filters) {
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        params.append(key, String(value));
-      }
-    });
-  }
   return get<PaginatedApiResponse<Campaign>>(
-    `/referral/v1/admin/campaigns/?${params.toString()}`
+    `${BASE_PATH}/${buildQueryString(filters)}`
   );
 };
 
@@ -58,22 +48,17 @@ export const getCampaigns = async (
  */
 export const getCampaignDetail = async (
   campaignId: string
-): Promise<ApiResponse<Campaign>> => {
-  return get<ApiResponse<Campaign>>(
-    `/referral/v1/admin/campaigns/${campaignId}/`
-  );
+): Promise<ApiResponse<CampaignDetail>> => {
+  return get<ApiResponse<CampaignDetail>>(`${BASE_PATH}/${campaignId}/`);
 };
 
 /**
  * Create new campaign
  */
 export const createCampaign = async (
-  data: CreateCampaignRequest
-): Promise<ApiResponse<Campaign>> => {
-  return post<ApiResponse<Campaign>, CreateCampaignRequest>(
-    '/referral/v1/admin/campaigns/create/',
-    data
-  );
+  payload: CreateCampaignPayload
+): Promise<ApiResponse<CampaignDetail>> => {
+  return post<ApiResponse<CampaignDetail>>(`${BASE_PATH}/create/`, payload);
 };
 
 /**
@@ -81,23 +66,60 @@ export const createCampaign = async (
  */
 export const updateCampaign = async (
   campaignId: string,
-  data: Partial<CreateCampaignRequest>
-): Promise<ApiResponse<Campaign>> => {
-  return patch<ApiResponse<Campaign>>(
-    `/referral/v1/admin/campaigns/${campaignId}/`,
-    data
+  payload: UpdateCampaignPayload
+): Promise<ApiResponse<CampaignDetail>> => {
+  return patch<ApiResponse<CampaignDetail>>(
+    `${BASE_PATH}/${campaignId}/`,
+    payload
   );
 };
 
 /**
- * Generate codes for campaign
+ * Deactivate campaign
+ */
+export const deactivateCampaign = async (
+  campaignId: string,
+  payload?: DeactivateCampaignPayload
+): Promise<ApiResponse<DeactivateCampaignResponse>> => {
+  return post<ApiResponse<DeactivateCampaignResponse>>(
+    `${BASE_PATH}/${campaignId}/deactivate/`,
+    payload || {}
+  );
+};
+
+/**
+ * Generate campaign codes
  */
 export const generateCampaignCodes = async (
   campaignId: string,
-  count: number
-): Promise<ApiResponse<{ generated_count: number; sample_codes: string[] }>> => {
-  return post(
-    `/referral/v1/admin/campaigns/${campaignId}/generate-codes/`,
-    { count }
+  payload: GenerateCodesPayload
+): Promise<ApiResponse<GenerateCodesResponse>> => {
+  return post<ApiResponse<GenerateCodesResponse>>(
+    `${BASE_PATH}/${campaignId}/generate-codes/`,
+    payload
   );
+};
+
+/**
+ * Get campaign performance
+ */
+export const getCampaignPerformance = async (params?: {
+  campaign_id?: string;
+  start_date?: string;
+  end_date?: string;
+}): Promise<ApiResponse<CampaignPerformance[]>> => {
+  return get<ApiResponse<CampaignPerformance[]>>(
+    `/referral/v1/admin/analytics/campaigns/${buildQueryString(params)}`
+  );
+};
+
+// Default export
+export default {
+  getCampaigns,
+  getCampaignDetail,
+  createCampaign,
+  updateCampaign,
+  deactivateCampaign,
+  generateCampaignCodes,
+  getCampaignPerformance,
 };

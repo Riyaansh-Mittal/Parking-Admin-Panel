@@ -15,9 +15,9 @@ export const formatDate = (date: string | Date, formatStr: string = 'MMM dd, yyy
 /**
  * Format datetime string
  */
-export const formatDateTime = (date: string | Date): string => {
-  return formatDate(date, 'MMM dd, yyyy HH:mm');
-};
+export const formatDateTime = (date: string | Date, fmt = 'MMM dd, yyyy HH:mm'): string => {
+  return formatDate(date, fmt);
+}
 
 /**
  * Format relative time (e.g., "2 hours ago")

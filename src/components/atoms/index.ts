@@ -7,3 +7,5 @@ export * from './Spinner';
 export * from './Checkbox';
 export * from './Radio';
 export * from './Switch';
+export * from './Textarea';
+export * from './Select';

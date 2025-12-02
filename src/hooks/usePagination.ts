@@ -1,10 +1,12 @@
 import { useState, useCallback, useMemo } from 'react';
 
 export interface UsePaginationOptions {
-  totalItems: number;
+  totalItems?: number;
   itemsPerPage?: number;
   initialPage?: number;
+  initialPageSize?: number;
   onPageChange?: (page: number) => void;
+  onPageSizeChange?: (size: number) => void;
 }
 
 export interface UsePaginationReturn {
@@ -19,16 +21,20 @@ export interface UsePaginationReturn {
   goToFirstPage: () => void;
   goToLastPage: () => void;
   setPageSize: (size: number) => void;
+  handlePageChange: (page: number) => void;
+  handlePageSizeChange: (size: number) => void;
 }
 
 export function usePagination({
-  totalItems,
+  totalItems = 0,
   itemsPerPage = 20,
   initialPage = 1,
+  initialPageSize,
   onPageChange,
+  onPageSizeChange,
 }: UsePaginationOptions): UsePaginationReturn {
   const [currentPage, setCurrentPage] = useState(initialPage);
-  const [pageSize, setPageSizeState] = useState(itemsPerPage);
+  const [pageSize, setPageSizeState] = useState(initialPageSize || itemsPerPage);
 
   const totalPages = useMemo(() => {
     return Math.ceil(totalItems / pageSize) || 1;
@@ -71,9 +77,14 @@ export function usePagination({
       setPageSizeState(size);
       setCurrentPage(1); // Reset to first page when changing page size
       onPageChange?.(1);
+      onPageSizeChange?.(size);
     },
-    [onPageChange]
+    [onPageChange, onPageSizeChange]
   );
+
+  // Aliases for backward compatibility
+  const handlePageChange = goToPage;
+  const handlePageSizeChange = setPageSize;
 
   return {
     currentPage,
@@ -87,5 +98,7 @@ export function usePagination({
     goToFirstPage,
     goToLastPage,
     setPageSize,
+    handlePageChange,
+    handlePageSizeChange,
   };
 }

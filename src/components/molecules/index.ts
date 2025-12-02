@@ -9,3 +9,4 @@ export * from './UserCard';
 export * from './StatCard';
 export * from './Alert';
 export * from './InputField';
+export * from './Stepper';
