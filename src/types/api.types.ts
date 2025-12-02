@@ -48,3 +48,21 @@ export interface RequestConfig {
   data?: unknown;
   headers?: Record<string, string>;
 }
+
+export interface PaginatedApiResponse<T> {
+  message: string;
+  pagination: {
+    count: number;
+    next: string | null;
+    previous: string | null;
+    current_page: number;
+    total_pages: number;
+    page_size: number;
+  };
+  data: {
+    message: string;
+    data: T[];
+    status: string;
+  };
+  status: number;
+}

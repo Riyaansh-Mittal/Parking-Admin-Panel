@@ -19,28 +19,34 @@ import {
 import { UsersListPage, UserDetailPage } from '@/features/users/pages';
 
 // Calls pages
-import { 
-  CallsListPage, 
-  CallDetailPage, 
-  CallStatsPage 
+import {
+  CallsListPage,
+  CallDetailPage,
+  CallStatsPage,
 } from '@/features/calls/pages';
 
 // Campaigns pages
-import { 
-  CampaignsListPage, 
-  CampaignDetailPage, 
-  CreateCampaignPage 
+import {
+  CampaignsListPage,
+  CampaignDetailPage,
+  CreateCampaignPage,
 } from '@/features/campaigns/pages';
 
 // Codes pages
 import { CodesListPage } from '@/features/codes/pages';
 
 // Admins pages (Superuser only)
-import { 
-  AdminsListPage, 
-  AdminDetailPage, 
-  RegisterAdminPage 
+import {
+  AdminsListPage,
+  AdminDetailPage,
+  RegisterAdminPage,
 } from '@/features/admins/pages';
+
+// Relationships pages
+import {
+  RelationshipsListPage,
+  RelationshipDetailPage,
+} from '@/features/relationships/pages';
 
 export const AppRoutes = () => {
   return (
@@ -70,8 +76,14 @@ export const AppRoutes = () => {
 
             {/* Campaigns Routes */}
             <Route path={ROUTES.CAMPAIGNS} element={<CampaignsListPage />} />
-            <Route path={ROUTES.CAMPAIGN_DETAIL} element={<CampaignDetailPage />} />
-            <Route path={ROUTES.CREATE_CAMPAIGN} element={<CreateCampaignPage />} />
+            <Route
+              path={ROUTES.CAMPAIGN_DETAIL}
+              element={<CampaignDetailPage />}
+            />
+            <Route
+              path={ROUTES.CREATE_CAMPAIGN}
+              element={<CreateCampaignPage />}
+            />
 
             {/* Codes Routes */}
             <Route path={ROUTES.CODES} element={<CodesListPage />} />
@@ -79,6 +91,16 @@ export const AppRoutes = () => {
             {/* Users Routes */}
             <Route path={ROUTES.USERS} element={<UsersListPage />} />
             <Route path={ROUTES.USER_DETAIL} element={<UserDetailPage />} />
+
+            {/* Relationships Routes */}
+            <Route
+              path={ROUTES.RELATIONSHIPS}
+              element={<RelationshipsListPage />}
+            />
+            <Route
+              path={ROUTES.RELATIONSHIP_DETAIL}
+              element={<RelationshipDetailPage />}
+            />
           </Route>
 
           {/* Superuser Only Routes */}
@@ -86,7 +108,10 @@ export const AppRoutes = () => {
             {/* Admins Management */}
             <Route path={ROUTES.ADMINS} element={<AdminsListPage />} />
             <Route path={ROUTES.ADMIN_DETAIL} element={<AdminDetailPage />} />
-            <Route path={ROUTES.REGISTER_ADMIN} element={<RegisterAdminPage />} />
+            <Route
+              path={ROUTES.REGISTER_ADMIN}
+              element={<RegisterAdminPage />}
+            />
 
             {/* Settings */}
             <Route path={ROUTES.SETTINGS} element={<div>Settings Page</div>} />

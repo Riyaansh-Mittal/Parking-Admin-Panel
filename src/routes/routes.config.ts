@@ -33,7 +33,7 @@ export const ROUTES = {
   
   // Relationships
   RELATIONSHIPS: '/relationships',
-  RELATIONSHIP_DETAIL: '/relationships/:id',
+  RELATIONSHIP_DETAIL: '/relationships/:relationshipId',
   
   // Balances
   BALANCES: '/balances',
