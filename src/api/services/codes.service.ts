@@ -1,30 +1,18 @@
-import { get, post } from '../client';
+import { get, post, patch } from '../client';
 import type { ApiResponse, PaginatedApiResponse } from '../types';
+import type {
+  ReferralCode,
+  CodeFilters,
+  UpdateCodePayload,
+  CreateStandaloneCodePayload,
+  CreateStandaloneCodeResponse,
+  BulkDeactivatePayload,
+  BulkExtendValidityPayload,
+  BulkIncreaseUsagePayload,
+  BulkActionResponse,
+  CodeStats,
+} from '@/features/codes/types';
 
-export interface ReferralCode {
-  id: string;
-  code: string;
-  code_type: 'user' | 'campaign';
-  status: 'active' | 'inactive' | 'expired' | 'exhausted';
-  owner_email: string | null;
-  campaign_name: string | null;
-  usage_count: number;
-  max_usage: number;
-  valid_from: string;
-  valid_until: string | null;
-  is_expired: boolean;
-  is_valid: boolean;
-  created_at: string;
-}
-
-export interface CodeFilters {
-  page?: number;
-  page_size?: number;
-  code_type?: string;
-  status?: string;
-  search?: string;
-  ordering?: string;
-}
 
 /**
  * Get paginated list of codes
@@ -35,7 +23,7 @@ export const getCodes = async (
   const params = new URLSearchParams();
   if (filters) {
     Object.entries(filters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
+      if (value !== undefined && value !== null && value !== '') {
         params.append(key, String(value));
       }
     });
@@ -55,11 +43,91 @@ export const getCodeDetail = async (
 };
 
 /**
+ * Update code
+ */
+export const updateCode = async (
+  codeId: string,
+  payload: UpdateCodePayload
+): Promise<ApiResponse<ReferralCode>> => {
+  return patch<ApiResponse<ReferralCode>>(
+    `/referral/v1/admin/codes/${codeId}/`,
+    payload
+  );
+};
+
+/**
+ * Create standalone code
+ */
+export const createStandaloneCode = async (
+  payload: CreateStandaloneCodePayload
+): Promise<ApiResponse<CreateStandaloneCodeResponse>> => {
+  return post<ApiResponse<CreateStandaloneCodeResponse>>(
+    '/referral/v1/admin/codes/create-standalone/',
+    payload
+  );
+};
+
+/**
  * Deactivate single code
  */
 export const deactivateCode = async (
   codeId: string,
   reason?: string
-): Promise<ApiResponse<{ code_id: string; status: string }>> => {
+): Promise<ApiResponse<{ code_id: string; code: string; status: string }>> => {
   return post('/referral/v1/admin/codes/deactivate/', { code_id: codeId, reason });
+};
+
+/**
+ * Bulk deactivate codes
+ */
+export const bulkDeactivateCodes = async (
+  payload: BulkDeactivatePayload
+): Promise<ApiResponse<BulkActionResponse>> => {
+  return post<ApiResponse<BulkActionResponse>>(
+    '/referral/v1/admin/codes/bulk/deactivate/',
+    payload
+  );
+};
+
+/**
+ * Bulk extend code validity
+ */
+export const bulkExtendValidity = async (
+  payload: BulkExtendValidityPayload
+): Promise<ApiResponse<BulkActionResponse>> => {
+  return post<ApiResponse<BulkActionResponse>>(
+    '/referral/v1/admin/codes/bulk/extend-validity/',
+    payload
+  );
+};
+
+/**
+ * Bulk increase usage limit
+ */
+export const bulkIncreaseUsage = async (
+  payload: BulkIncreaseUsagePayload
+): Promise<ApiResponse<BulkActionResponse>> => {
+  return post<ApiResponse<BulkActionResponse>>(
+    '/referral/v1/admin/codes/bulk/increase-usage/',
+    payload
+  );
+};
+
+/**
+ * Get code statistics
+ */
+export const getCodeStats = async (): Promise<ApiResponse<CodeStats>> => {
+  return get<ApiResponse<CodeStats>>('/referral/v1/admin/analytics/summary/');
+};
+
+export const codesService = {
+  getCodes,
+  getCodeDetail,
+  updateCode,
+  createStandaloneCode,
+  deactivateCode,
+  bulkDeactivateCodes,
+  bulkExtendValidity,
+  bulkIncreaseUsage,
+  getCodeStats,
 };
