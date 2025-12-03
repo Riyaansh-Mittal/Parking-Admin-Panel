@@ -39,7 +39,7 @@ import { CodesListPage } from '@/features/codes/pages';
 import {
   BalancesListPage,
   BalanceDetailPage,
-  ResetLogsPage
+  ResetLogsPage,
 } from '@/features/balances/pages';
 
 // Admins pages (Superuser only)
@@ -54,6 +54,12 @@ import {
   RelationshipsListPage,
   RelationshipDetailPage,
 } from '@/features/relationships/pages';
+
+// Settings pages (Superuser only)
+import {
+  SettingsListPage,
+  SettingDetailPage,
+} from '@/features/settings/pages';
 
 export const AppRoutes = () => {
   return (
@@ -131,8 +137,12 @@ export const AppRoutes = () => {
               element={<RegisterAdminPage />}
             />
 
-            {/* Settings */}
-            <Route path={ROUTES.SETTINGS} element={<div>Settings Page</div>} />
+            {/* Platform Settings */}
+            <Route path={ROUTES.SETTINGS} element={<SettingsListPage />} />
+            <Route
+              path={ROUTES.SETTING_DETAIL}
+              element={<SettingDetailPage />}
+            />
           </Route>
         </Route>
       </Route>

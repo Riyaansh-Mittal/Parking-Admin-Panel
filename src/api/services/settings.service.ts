@@ -11,8 +11,14 @@ export interface PlatformSetting {
   min_value?: string;
   max_value?: string;
   editable_by: 'admin' | 'superuser';
+  visible_in_ui: boolean;
+  requires_restart: boolean;
+  group: string;
+  sort_order: number;
+  help_text?: string;
   created_at: string;
   updated_at: string;
+  [key: string]: unknown;
 }
 
 export interface SettingFilters {
@@ -38,6 +44,7 @@ export const getSettings = async (
       }
     });
   }
+
   return get<PaginatedApiResponse<PlatformSetting>>(
     `/platform-settings/settings/?${params.toString()}`
   );
