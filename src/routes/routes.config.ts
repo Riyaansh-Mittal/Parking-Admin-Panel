@@ -37,8 +37,8 @@ export const ROUTES = {
   
   // Balances
   BALANCES: '/balances',
-  BALANCE_DETAIL: '/balances/:id',
-  BALANCE_HISTORY: '/balances/history',
+  BALANCE_DETAIL: '/balances/:userId',
+  BALANCE_RESET_LOGS: '/balances/reset-logs/:userId',
   
   // Settings
   SETTINGS: '/settings',

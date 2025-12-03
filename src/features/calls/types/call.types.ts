@@ -1,10 +1,5 @@
 import type { IconName } from '@/components/atoms/Icon';
-
-/**
- * Badge variant type (matching Badge component)
- */
-export type BadgeVariant = 'success' | 'error' | 'warning' | 'info' | 'neutral';
-
+import type { BadgeVariant } from '@/components/atoms/Badge/Badge';
 /**
  * Call participant info (inviter/invitee)
  */

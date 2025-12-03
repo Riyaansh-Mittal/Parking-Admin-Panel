@@ -1,27 +1,19 @@
 import { get, patch, post } from '../client';
 import type { ApiResponse } from '../types';
-
-export interface Balance {
-  user_id: string;
-  user_name: string;
-  user_email: string;
-  base_balance: string;
-  bonus_balance: string;
-  total_balance: string;
-  last_reset: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface BalanceFilters {
-  search?: string;
-  min_balance?: number;
-  max_balance?: number;
-  ordering?: string;
-}
+import type {
+  Balance,
+  BalanceDetail,
+  BalanceFilters,
+  UpdateBalanceRequest,
+  BulkUpdateBalanceRequest,
+  BulkUpdateResponse,
+  ResetLog,
+  ResetLogFilters,
+} from '@/features/balances/types';
+import type { PaginationMeta } from '@/types/pagination.types';
 
 /**
- * Get list of user balances
+ * Get list of user balances (returns direct array)
  */
 export const getBalances = async (
   filters?: BalanceFilters
@@ -34,20 +26,22 @@ export const getBalances = async (
       }
     });
   }
+
   return get<Balance[]>(
-    `/platform-settings/balances/?${params.toString()}`
+    `/platform-settings/balances/${params.toString() ? '?' + params.toString() : ''}`
   );
 };
 
 /**
- * Get balance detail for specific user
+ * Get balance detail for specific user with recent changes
  */
 export const getBalanceDetail = async (
   userId: string
-): Promise<ApiResponse<{ balance: Balance; recent_changes: unknown[] }>> => {
-  return get<ApiResponse<{ balance: Balance; recent_changes: unknown[] }>>(
+): Promise<BalanceDetail> => {
+  const response = await get<ApiResponse<BalanceDetail>>(
     `/platform-settings/balances/${userId}/`
   );
+  return response.data;
 };
 
 /**
@@ -55,26 +49,60 @@ export const getBalanceDetail = async (
  */
 export const updateBalance = async (
   userId: string,
-  data: {
-    base_balance?: string;
-    operation: 'add' | 'subtract' | 'set';
-    notes?: string;
-  }
-): Promise<ApiResponse<Balance>> => {
-  return patch<ApiResponse<Balance>>(
+  data: UpdateBalanceRequest
+): Promise<Balance> => {
+  const response = await patch<ApiResponse<Balance>>(
     `/platform-settings/balances/${userId}/`,
     data
   );
+  return response.data;
 };
 
 /**
  * Bulk update balances
  */
-export const bulkUpdateBalances = async (data: {
-  user_ids: string[];
-  operation: 'add' | 'subtract' | 'set';
-  base_balance?: string;
-  notes?: string;
-}): Promise<ApiResponse<{ total: number; success: number; failed: number }>> => {
-  return post('/platform-settings/balances/bulk-update/', data);
+export const bulkUpdateBalances = async (
+  data: BulkUpdateBalanceRequest
+): Promise<BulkUpdateResponse> => {
+  const response = await post<ApiResponse<BulkUpdateResponse>>(
+    '/platform-settings/balances/bulk-update/',
+    data
+  );
+  return response.data;
+};
+
+/**
+ * Get reset logs (balance change history)
+ */
+export const getResetLogs = async (
+  filters?: ResetLogFilters,
+  page?: number,
+  pageSize?: number
+): Promise<{ data: ResetLog[]; pagination: PaginationMeta }> => {
+  const params = new URLSearchParams();
+  
+  if (page) params.append('page', String(page));
+  if (pageSize) params.append('page_size', String(pageSize));
+  
+  if (filters) {
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        params.append(key, String(value));
+      }
+    });
+  }
+
+  const response = await get<{
+    message: string;
+    data: ResetLog[];
+    pagination: PaginationMeta;
+    status: number;
+  }>(
+    `/platform-settings/reset-logs/${params.toString() ? '?' + params.toString() : ''}`
+  );
+  
+  return {
+    data: response.data,
+    pagination: response.pagination,
+  };
 };

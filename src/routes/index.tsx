@@ -35,6 +35,13 @@ import {
 // Codes pages
 import { CodesListPage } from '@/features/codes/pages';
 
+// Balances pages
+import {
+  BalancesListPage,
+  BalanceDetailPage,
+  ResetLogsPage
+} from '@/features/balances/pages';
+
 // Admins pages (Superuser only)
 import {
   AdminsListPage,
@@ -87,6 +94,17 @@ export const AppRoutes = () => {
 
             {/* Codes Routes */}
             <Route path={ROUTES.CODES} element={<CodesListPage />} />
+
+            {/* Balances Routes */}
+            <Route path={ROUTES.BALANCES} element={<BalancesListPage />} />
+            <Route
+              path={ROUTES.BALANCE_DETAIL}
+              element={<BalanceDetailPage />}
+            />
+            <Route
+              path={ROUTES.BALANCE_RESET_LOGS}
+              element={<ResetLogsPage />}
+            />
 
             {/* Users Routes */}
             <Route path={ROUTES.USERS} element={<UsersListPage />} />
