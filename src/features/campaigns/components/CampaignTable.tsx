@@ -124,9 +124,12 @@ export const CampaignTable = ({
     },
   ];
 
+  // ✅ Ensure campaigns is always an array
+  const safeCampaigns = Array.isArray(campaigns) ? campaigns : [];
+
   return (
     <DataTable
-      data={campaigns as unknown as Record<string, unknown>[]}
+      data={safeCampaigns as unknown as Record<string, unknown>[]}
       columns={columns as unknown as TableColumn<Record<string, unknown>>[]}
       loading={loading}
       emptyMessage="No campaigns found"

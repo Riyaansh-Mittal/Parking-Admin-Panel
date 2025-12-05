@@ -3,55 +3,55 @@ export const ROUTES = {
   LOGIN: '/login',
   VERIFY_EMAIL: '/verify-email',
   SET_PASSWORD: '/set-password',
-  
+
   // Main
   HOME: '/',
   DASHBOARD: '/dashboard',
-  
+
   // Users
   USERS: '/users',
   USER_DETAIL: '/users/:userId',
-  
+
   // Admins
   ADMINS: '/admins',
   ADMIN_DETAIL: '/admins/:adminId',
   REGISTER_ADMIN: '/admins/register',
-  
+
   // Calls
   CALLS: '/calls',
   CALL_DETAIL: '/calls/:callId',
   CALL_STATS: '/calls/stats',
-  
+
   // Campaigns
   CAMPAIGNS: '/campaigns',
   CAMPAIGN_DETAIL: '/campaigns/:campaignId',
   CREATE_CAMPAIGN: '/campaigns/create',
-  
+
   // Codes
   CODES: '/codes',
   CODE_DETAIL: '/codes/:id',
-  
+
   // Relationships
   RELATIONSHIPS: '/relationships',
   RELATIONSHIP_DETAIL: '/relationships/:relationshipId',
-  
+
   // Balances
   BALANCES: '/balances',
   BALANCE_DETAIL: '/balances/:userId',
   BALANCE_RESET_LOGS: '/balances/reset-logs/:userId',
-  
+
   // Settings
   SETTINGS: '/settings',
   SETTING_DETAIL: '/settings/:key',
-  
+
   // Analytics
   ANALYTICS: '/analytics',
   CALL_ANALYTICS: '/analytics/calls',
   REFERRAL_ANALYTICS: '/analytics/referrals',
-  
+
   // Exports
   EXPORTS: '/exports',
-  
+
   // Errors
   NOT_FOUND: '/404',
   UNAUTHORIZED: '/403',
@@ -63,7 +63,10 @@ export type RouteValue = (typeof ROUTES)[RouteKey];
 /**
  * Helper to build route with params
  */
-export const buildRoute = (route: string, params: Record<string, string>): string => {
+export const buildRoute = (
+  route: string,
+  params: Record<string, string>
+): string => {
   let path = route;
   Object.entries(params).forEach(([key, value]) => {
     path = path.replace(`:${key}`, value);
@@ -132,8 +135,20 @@ export const NAV_ITEMS: NavItem[] = [
   },
   {
     label: 'Analytics',
-    path: ROUTES.ANALYTICS,
-    icon: 'BarChart3',
+    path: '/analytics/calls',
+    icon: 'ChartBar', // Lucide icon name for bar chart
+    children: [
+      {
+        label: 'Call Analytics',
+        path: '/analytics/calls',
+        icon: 'Phone', // or 'PhoneCall'
+      },
+      {
+        label: 'Referral Analytics',
+        path: '/analytics/referrals',
+        icon: 'Users', // or 'UserPlus' or 'Share2'
+      },
+    ],
   },
   {
     label: 'Settings',

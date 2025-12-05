@@ -12,7 +12,7 @@ import type {
 } from '@/features/balances/types';
 import * as balancesService from '@/api/services/balances.service';
 
-interface BalancesState {
+export interface BalancesState {
   balances: Balance[];
   currentBalance: BalanceDetail | null;
   resetLogs: ResetLog[];

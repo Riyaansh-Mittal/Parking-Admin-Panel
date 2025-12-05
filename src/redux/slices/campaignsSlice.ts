@@ -11,7 +11,7 @@ import type {
 } from '@/features/campaigns/types';
 import type { PaginationMeta } from '@/types/pagination.types';
 
-interface CampaignsState {
+export interface CampaignsState {
   campaigns: Campaign[];
   currentCampaign: CampaignDetail | null;
   performance: CampaignPerformance[];

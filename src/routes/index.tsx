@@ -10,7 +10,7 @@ import {
   LoginPage,
   VerifyEmailPage,
   SetPasswordPage,
-  DashboardPage,
+  // DashboardPage,
   NotFoundPage,
   UnauthorizedPage,
 } from '@/pages';
@@ -56,10 +56,13 @@ import {
 } from '@/features/relationships/pages';
 
 // Settings pages (Superuser only)
+import { SettingsListPage, SettingDetailPage } from '@/features/settings/pages';
+
 import {
-  SettingsListPage,
-  SettingDetailPage,
-} from '@/features/settings/pages';
+  DashboardPage as AnalyticsDashboardPage,
+  CallAnalyticsPage,
+  ReferralAnalyticsPage,
+} from '@/features/analytics/pages';
 
 export const AppRoutes = () => {
   return (
@@ -78,7 +81,7 @@ export const AppRoutes = () => {
       <Route element={<ProtectedRoute />}>
         <Route element={<MainLayout />}>
           {/* Dashboard - Accessible to all authenticated users */}
-          <Route path={ROUTES.DASHBOARD} element={<DashboardPage />} />
+          <Route path={ROUTES.DASHBOARD} element={<AnalyticsDashboardPage />} />
 
           {/* Admin Access Routes */}
           <Route element={<RoleBasedRoute requiredRole="admin" />}>
@@ -124,6 +127,16 @@ export const AppRoutes = () => {
             <Route
               path={ROUTES.RELATIONSHIP_DETAIL}
               element={<RelationshipDetailPage />}
+            />
+
+            {/* Analytics Routes */}
+            <Route
+              path={ROUTES.CALL_ANALYTICS}
+              element={<CallAnalyticsPage />}
+            />
+            <Route
+              path={ROUTES.REFERRAL_ANALYTICS}
+              element={<ReferralAnalyticsPage />}
             />
           </Route>
 

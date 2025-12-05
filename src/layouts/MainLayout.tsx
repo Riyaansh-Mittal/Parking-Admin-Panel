@@ -16,15 +16,17 @@ export const MainLayout = () => {
         
         <main
           className={cn(
-            'flex-1 overflow-y-auto p-4 transition-all duration-300 lg:p-6',
-            sidebarCollapsed ? 'lg:ml-0' : 'lg:ml-0'
+            'flex-1 overflow-y-auto p-4 transition-all duration-300',
+            'md:p-6 lg:p-8',
+            // Add left padding on desktop when sidebar is expanded
+            !sidebarCollapsed ? 'md:ml-64' : 'md:ml-20'
           )}
         >
-          <Outlet />
+          <div className="mx-auto max-w-7xl">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>
   );
 };
-
-MainLayout.displayName = 'MainLayout';
